@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Algoria Trading Platform
 
 A comprehensive trading platform for algorithmic strategy management, signal tracking, and portfolio analytics.
@@ -61,3 +62,6 @@ The project follows React best practices with a modular, component-based archite
 ## License
 
 This project is licensed under the MIT License.
+=======
+# Algoria1.0
+>>>>>>> 244e1ee4c3204b0cf9f96190d58cbfcb05a79663
