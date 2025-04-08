@@ -7,10 +7,16 @@
     "dev": "vite --host 0.0.0.0",
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "server": "node token-server.js",
+    "dev:all": "concurrently \"npm run dev\" \"npm run server\""
   },
   "dependencies": {
+    "axios": "^1.6.8",
     "clsx": "^2.1.1",
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "fyers-api-v3": "^1.4.1",
     "lucide-react": "^0.487.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -31,6 +37,7 @@
     "@typescript-eslint/parser": "^8.20.0",
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.20",
+    "concurrently": "^8.2.2",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-import-resolver-typescript": "^3.7.0",

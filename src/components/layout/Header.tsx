@@ -1,3 +1,4 @@
+import React from 'react';
 import {
   Menu,
   TrendingUp,
@@ -12,6 +13,7 @@ import {
   Check,
   Info,
   AlertTriangle,
+  RefreshCw,
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -25,7 +27,7 @@ import { useNotifications } from "../../context/NotificationContext";
 interface HeaderProps {
   pageName: string;
   showRefresh?: boolean;
-  onMenuToggle?: () => void;
+  onMenuToggle: () => void;
 }
 
 interface IndexPrice {
@@ -163,7 +165,7 @@ const Header: React.FC<HeaderProps> = ({ pageName, showRefresh = false, onMenuTo
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAppContext();
-  const { isDark } = useTheme(); // Use theme context
+  const { theme, toggleTheme } = useTheme();
   const { showToast } = useNotifications();
 
   // Dropdown states
@@ -333,196 +335,53 @@ const Header: React.FC<HeaderProps> = ({ pageName, showRefresh = false, onMenuTo
 
   return (
     <header className={cn(
-      "bg-gradient-to-r shadow-md flex justify-between items-center p-3 px-6 text-white sticky top-0 z-50 h-[64px]",
-      {
-        'from-indigo-700 to-indigo-600': pageStyle.accent === 'indigo',
-        'from-amber-700 to-amber-600': pageStyle.accent === 'amber',
-        'from-emerald-700 to-emerald-600': pageStyle.accent === 'emerald',
-        'from-teal-700 to-teal-600': pageStyle.accent === 'teal',
-      },
-      isDark && {
-        'from-indigo-900 to-indigo-800': pageStyle.accent === 'indigo',
-        'from-amber-900 to-amber-800': pageStyle.accent === 'amber',
-        'from-emerald-900 to-emerald-800': pageStyle.accent === 'emerald',
-        'from-teal-900 to-teal-800': pageStyle.accent === 'teal',
-      }
+      "h-16 border-b border-gray-200 transition-colors duration-200",
+      theme === 'dark' ? "bg-gray-800 border-gray-700" : "bg-white"
     )}>
+      <div className="px-4 h-full flex items-center justify-between">
       <div className="flex items-center">
-        {/* Menu Toggle Button */}
-        {onMenuToggle && (
           <button
             onClick={onMenuToggle}
             className={cn(
-              "mr-3 p-2 rounded-lg transition-colors",
-              pageStyle.buttonBg,
-              pageStyle.buttonHoverBg
+              "p-2 rounded-md mr-4",
+              theme === 'dark' ? "hover:bg-gray-700" : "hover:bg-gray-100"
             )}
-            aria-label="Toggle menu"
           >
-            <Menu size={20} />
+            <Menu size={20} className={theme === 'dark' ? "text-gray-200" : "text-gray-600"} />
           </button>
-        )}
-
-        {/* Logo */}
-        <div className="flex items-center mr-4 cursor-pointer" onClick={() => navigate('/')}>
-          <div className="bg-white rounded-lg flex items-center justify-center h-8 w-8 shadow-sm mr-2">
-            <span className={cn({
-              'text-indigo-600': pageStyle.accent === 'indigo',
-              'text-amber-600': pageStyle.accent === 'amber',
-              'text-emerald-600': pageStyle.accent === 'emerald',
-              'text-teal-600': pageStyle.accent === 'teal',
-            }, "font-bold text-xl")}>A</span>
-          </div>
-          <span className="font-bold text-lg text-white tracking-wide">ALGORIA</span>
-        </div>
-
-        <div className={cn("h-6 border-l-2 mx-3", {
-          'border-indigo-400/30': pageStyle.accent === 'indigo',
-          'border-amber-400/30': pageStyle.accent === 'amber',
-          'border-emerald-400/30': pageStyle.accent === 'emerald',
-          'border-teal-400/30': pageStyle.accent === 'teal',
-        })} />
-
-        <h1 className="text-xl font-bold tracking-wide flex items-center">
-          {pageStyle.icon}
+          
+          <h1 className={cn(
+            "text-lg font-semibold",
+            theme === 'dark' ? "text-white" : "text-gray-800"
+          )}>
           {pageName}
         </h1>
       </div>
 
-      <div className="flex items-center space-x-5">
-        {/* Live Index Prices */}
-        <div className="hidden md:flex items-center space-x-3">
-          {/* Nifty Price */}
-          <div className={cn("py-1 px-3 rounded-md", pageStyle.buttonBg)}>
             <div className="flex items-center">
-              <TrendingUp size={14} className={cn("mr-1", {
-                'text-indigo-300': pageStyle.accent === 'indigo',
-                'text-amber-300': pageStyle.accent === 'amber',
-                'text-emerald-300': pageStyle.accent === 'emerald',
-                'text-teal-300': pageStyle.accent === 'teal',
-              })} />
-              <span className={cn("text-xs font-semibold", {
-                'text-indigo-100': pageStyle.accent === 'indigo',
-                'text-amber-100': pageStyle.accent === 'amber',
-                'text-emerald-100': pageStyle.accent === 'emerald',
-                'text-teal-100': pageStyle.accent === 'teal',
-              })}>NIFTY</span>
-            </div>
-            <div className="flex items-center">
-              <span className="text-sm font-bold mr-1.5">{formatPrice(niftyPrice.price)}</span>
-              <div className={`flex items-center text-xs ${niftyPrice.change >= 0 ? 'text-green-300' : 'text-red-300'}`}>
-                {niftyPrice.change >= 0 ? <ArrowUp size={12} /> : <ArrowDown size={12} />}
-                <span className="mx-0.5">{formatChange(niftyPrice.change)}</span>
-                <span>({formatPercentChange(niftyPrice.percentChange)})</span>
-              </div>
-            </div>
-          </div>
-
-          {/* BankNifty Price */}
-          <div className={cn("py-1 px-3 rounded-md", pageStyle.buttonBg)}>
-            <div className="flex items-center">
-              <TrendingUp size={14} className={cn("mr-1", {
-                'text-indigo-300': pageStyle.accent === 'indigo',
-                'text-amber-300': pageStyle.accent === 'amber',
-                'text-emerald-300': pageStyle.accent === 'emerald',
-                'text-teal-300': pageStyle.accent === 'teal',
-              })} />
-              <span className={cn("text-xs font-semibold", {
-                'text-indigo-100': pageStyle.accent === 'indigo',
-                'text-amber-100': pageStyle.accent === 'amber',
-                'text-emerald-100': pageStyle.accent === 'emerald',
-                'text-teal-100': pageStyle.accent === 'teal',
-              })}>BANKNIFTY</span>
-            </div>
-            <div className="flex items-center">
-              <span className="text-sm font-bold mr-1.5">{formatPrice(bankniftyPrice.price)}</span>
-              <div className={`flex items-center text-xs ${bankniftyPrice.change >= 0 ? 'text-green-300' : 'text-red-300'}`}>
-                {bankniftyPrice.change >= 0 ? <ArrowUp size={12} /> : <ArrowDown size={12} />}
-                <span className="mx-0.5">{formatChange(bankniftyPrice.change)}</span>
-                <span>({formatPercentChange(bankniftyPrice.percentChange)})</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className={cn("flex items-center space-x-1 py-1 px-3 rounded-full text-sm", pageStyle.buttonBg)}>
-          <Clock size={16} className={cn("mr-1", {
-            'text-indigo-300': pageStyle.accent === 'indigo',
-            'text-amber-300': pageStyle.accent === 'amber',
-            'text-emerald-300': pageStyle.accent === 'emerald',
-            'text-teal-300': pageStyle.accent === 'teal',
-          })} />
-          <span className="font-medium">{currentTime}</span>
-        </div>
-
-        <div className="flex items-center space-x-3">
-          {/* DMAT connector component */}
-          <DmatConnector />
-
-          {/* Theme Toggle */}
-          <ThemeToggle />
-
-          {/* Notifications dropdown */}
-          <div className="relative" ref={notificationsRef}>
+          {showRefresh && (
             <button
               className={cn(
-                "relative p-1.5 rounded-full transition-colors",
-                pageStyle.buttonBg,
-                pageStyle.buttonHoverBg
+                "p-2 rounded-md mr-3",
+                theme === 'dark' ? "hover:bg-gray-700 text-gray-300" : "hover:bg-gray-100 text-gray-600"
               )}
-              onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
+              onClick={() => window.location.reload()}
             >
-              <Bell size={18} />
-              {notificationCount > 0 && (
-                <span className="absolute top-0 right-0 bg-red-500 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full">
-                  {notificationCount}
-                </span>
-              )}
+              <RefreshCw size={18} />
             </button>
-
-            {isNotificationsOpen && (
-              <NotificationsDropdown
-                notifications={notifications}
-                onClose={() => setIsNotificationsOpen(false)}
-                onClearAll={clearAllNotifications}
-                onMarkAsRead={markAsRead}
-              />
-            )}
-          </div>
-
-          {/* User menu dropdown */}
-          <div className="relative" ref={userMenuRef}>
+          )}
+          
             <button
+            onClick={toggleTheme}
               className={cn(
-                "flex items-center space-x-2 py-1 px-3 rounded-full transition-colors",
-                pageStyle.buttonBg,
-                pageStyle.buttonHoverBg
-              )}
-              onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-            >
-              <div className={cn("w-7 h-7 rounded-full bg-white overflow-hidden border-2", {
-                'border-indigo-300': pageStyle.accent === 'indigo',
-                'border-amber-300': pageStyle.accent === 'amber',
-                'border-emerald-300': pageStyle.accent === 'emerald',
-                'border-teal-300': pageStyle.accent === 'teal',
-              })}>
-                <img
-                  src="https://i.pravatar.cc/120?img=68"
-                  alt="User"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <span className="text-sm font-medium">{user?.name || "Guest"}</span>
-              <MoreVertical size={16} />
-            </button>
-
-            {isUserMenuOpen && (
-              <UserMenuDropdown
-                user={user}
-                onClose={() => setIsUserMenuOpen(false)}
-              />
+              "p-2 rounded-md",
+              theme === 'dark' 
+                ? "bg-gray-700 text-yellow-300 hover:bg-gray-600" 
+                : "bg-gray-100 text-blue-600 hover:bg-gray-200"
             )}
-          </div>
+          >
+            {theme === 'dark' ? '☀️' : '🌙'}
+          </button>
         </div>
       </div>
     </header>

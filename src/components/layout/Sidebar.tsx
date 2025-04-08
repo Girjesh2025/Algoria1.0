@@ -1,174 +1,102 @@
-import { type FC } from 'react';
+import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import {
-  Home,
-  LineChart,
-  Activity,
-  BarChart4,
-  FileBarChart,
-  ChevronsLeft,
-  ChevronRight,
-  TrendingUp
-} from 'lucide-react';
 import { cn } from '../../utils/cn';
-import { useState, useEffect } from 'react';
-import VersionDisplay from '../VersionDisplay';
 import { useTheme } from '../../context/ThemeContext';
+import {
+  LayoutDashboard,
+  LineChart,
+  Radio,
+  BarChart,
+  FileSpreadsheet,
+  BarChart2
+} from 'lucide-react';
 
 interface SidebarProps {
-  isOpen?: boolean;
+  isOpen: boolean;
 }
 
-const Sidebar: FC<SidebarProps> = ({ isOpen = true }) => {
+const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
   const location = useLocation();
-  const [collapsed, setCollapsed] = useState(false);
-  const { isDark } = useTheme();
-
-  // Reset collapsed state when isOpen changes
-  useEffect(() => {
-    if (!isOpen) {
-      setCollapsed(true);
-    }
-  }, [isOpen]);
-
-  const menuItems = [
+  const { theme } = useTheme();
+  
+  const links = [
     {
-      name: 'Home',
+      name: 'Dashboard',
       path: '/',
-      icon: <Home size={collapsed ? 20 : 18} className="text-white" />
+      icon: <LayoutDashboard size={18} />
     },
     {
       name: 'Strategy',
       path: '/strategy',
-      icon: <LineChart size={collapsed ? 20 : 18} className="text-white" />
+      icon: <LineChart size={18} />
     },
     {
       name: 'Live Strategy',
       path: '/live-strategy',
-      icon: <Activity size={collapsed ? 20 : 18} className="text-white" />
+      icon: <Radio size={18} />
     },
     {
       name: 'Live Signals',
       path: '/live-signals',
-      icon: <TrendingUp size={collapsed ? 20 : 18} className="text-indigo-200" />,
-      badge: { text: 'Live', color: isDark ? 'bg-indigo-600' : 'bg-indigo-500' },
-      customStyle: 'from-indigo-600/20 to-transparent'
+      icon: <BarChart size={18} />
     },
     {
       name: 'Signal Report',
       path: '/signal-report',
-      icon: <FileBarChart size={collapsed ? 20 : 18} className="text-amber-200" />,
-      badge: { text: 'Report', color: isDark ? 'bg-amber-600' : 'bg-amber-500' },
-      customStyle: 'from-amber-600/20 to-transparent'
+      icon: <FileSpreadsheet size={18} />
     },
     {
       name: 'Trades',
       path: '/trades',
-      icon: <BarChart4 size={collapsed ? 20 : 18} className="text-emerald-200" />,
-      badge: { text: 'Portfolio', color: isDark ? 'bg-emerald-600' : 'bg-emerald-500' },
-      customStyle: 'from-emerald-600/20 to-transparent'
-    },
+      icon: <BarChart2 size={18} />
+    }
   ];
-
-  const isActive = (path: string) => {
-    if (path === '/' && (location.pathname === '/' || location.pathname === '/dashboard')) return true;
-    if (path !== '/' && location.pathname === path) return true;
-    return false;
-  };
-
-  const toggleSidebar = () => {
-    setCollapsed(!collapsed);
-  };
 
   return (
     <div
       className={cn(
-        "bg-gradient-to-b h-screen transition-all duration-300 shadow-lg relative",
-        isDark ? "from-teal-800 to-teal-900" : "from-teal-600 to-teal-700",
-        collapsed ? "w-[70px]" : "w-[200px]"
+        "h-full w-[200px] transition-all duration-300 overflow-hidden",
+        theme === 'dark' ? "bg-gray-800 text-white" : "bg-white border-r border-gray-200",
+        !isOpen && "w-0"
       )}
-      style={{ zIndex: 50 }}
     >
-      <button
-        onClick={toggleSidebar}
-        className="absolute -right-3 top-20 bg-white rounded-full p-1 shadow-md text-teal-600 hover:text-teal-800 transition-colors z-10"
-      >
-        {collapsed ? <ChevronRight size={16} /> : <ChevronsLeft size={16} />}
-      </button>
-
-      <div className="p-4 flex justify-center border-b border-teal-500/30 pt-16">
-        <div className="flex flex-col items-center">
-          <div className="w-12 h-12 bg-white rounded-full overflow-hidden mb-2 ring-2 ring-white/30 shadow-md">
-            <img src="https://i.pravatar.cc/120?img=68" alt="User avatar" className="w-full h-full object-cover" />
+      <div className="flex flex-col h-full">
+        <div className="p-4">
+          <h2 className={cn(
+            "text-lg font-semibold mb-6",
+            theme === 'dark' ? "text-white" : "text-gray-800"
+          )}>
+            ALGORIA
+          </h2>
+          
+          <nav className="flex flex-col space-y-1">
+            {links.map((link) => (
+              <Link
+                key={link.path}
+                to={link.path}
+                className={cn(
+                  "flex items-center px-3 py-2 rounded-md transition-colors",
+                  location.pathname === link.path
+                    ? (theme === 'dark' ? "bg-gray-700 text-white" : "bg-gray-100 text-blue-600")
+                    : (theme === 'dark' ? "text-gray-300 hover:bg-gray-700" : "text-gray-700 hover:bg-gray-100")
+                )}
+              >
+                <span className="mr-3">{link.icon}</span>
+                <span>{link.name}</span>
+              </Link>
+            ))}
+          </nav>
+        </div>
+        
+        <div className="mt-auto p-4 border-t border-gray-700">
+          <div className={cn(
+            "text-xs",
+            theme === 'dark' ? "text-gray-400" : "text-gray-500"
+          )}>
+            Version 8.7.0
           </div>
-          {!collapsed && (
-            <>
-              <span className="text-sm font-medium text-white">Girjesh</span>
-              <div className="flex items-center mt-1">
-                <span className="w-2 h-2 bg-green-400 rounded-full mr-1.5" />
-                <span className="text-xs text-teal-100">Online</span>
-              </div>
-            </>
-          )}
-          {collapsed && <span className="w-2 h-2 bg-green-400 rounded-full mt-1" />}
         </div>
       </div>
-
-      <nav className="mt-6 px-2">
-        {menuItems.map((item) => {
-          const active = isActive(item.path);
-          return (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={cn(
-                "flex items-center py-3 px-3 rounded-lg mb-1 transition-all duration-200 group relative overflow-hidden",
-                active
-                  ? "bg-white/15 text-white"
-                  : "text-teal-100 hover:bg-white/10 hover:text-white"
-              )}
-            >
-              <div className={cn(
-                "relative z-10 transition-transform",
-                active && !collapsed ? "transform scale-110" : ""
-              )}>
-                {item.icon}
-              </div>
-              {!collapsed && (
-                <div className="flex items-center flex-grow">
-                  <span className={cn(
-                    "ml-3 text-sm transition-all duration-200 relative z-10",
-                    active ? "font-medium" : ""
-                  )}>
-                    {item.name}
-                  </span>
-
-                  {item.badge && (
-                    <span className={cn(
-                      "ml-auto text-[10px] text-white px-1.5 py-0.5 rounded-full font-medium",
-                      item.badge.color
-                    )}>
-                      {item.badge.text}
-                    </span>
-                  )}
-                </div>
-              )}
-              {active && (
-                <div className={cn(
-                  "absolute inset-0 bg-gradient-to-r opacity-50",
-                  item.customStyle || (isDark ? 'from-teal-600/20 to-transparent' : 'from-teal-500/20 to-transparent')
-                )} />
-              )}
-            </Link>
-          );
-        })}
-      </nav>
-
-      {!collapsed && (
-        <div className="absolute bottom-6 left-0 right-0 px-4">
-          <VersionDisplay />
-        </div>
-      )}
     </div>
   );
 };
